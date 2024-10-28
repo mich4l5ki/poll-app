@@ -4,7 +4,7 @@ CREATE_POLLS = """CREATE TABLE IF NOT EXISTS polls
 CREATE_OPTIONS = """CREATE TABLE IF NOT EXISTS options
 (id SERIAL PRIMARY KEY, option_text TEXT, poll_id INTEGER, FOREIGN KEY(poll_id) REFERENCES polls(id));"""
 CREATE_VOTES = """CREATE TABLE IF NOT EXISTS votes
-(username TEXT option_id INTEGER, FOREIGN KEY(option_id) REFERENCES options(id));"""
+(username TEXT, option_id INTEGER, FOREIGN KEY(option_id) REFERENCES options(id));"""
 
 SELECT_ALL_POLLS = "SELECT * FROM polls;"
 SELECT_POLL_WITH_OPTIONS = "SELECT * FROM polls JOIN options ON polls.id = options.poll_id WHERE oplls.id = %s;"
