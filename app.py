@@ -1,12 +1,14 @@
+import datetime
 import random
+import pytz
 
 import database
 
+from connection_pool import get_connection
 from models.option import Option
 from models.poll import Poll
-from connections import create_connection
 
-DATABASE_PROMPT = "Enter the DATABASE_URI value or leave empty to load from .env file: "
+
 MENU_PROMPT = """--- Menu ---
 
 1) Create new poll
@@ -63,6 +65,17 @@ def show_poll_votes():
     except ZeroDivisionError:
         print("NO votes cast for this poll yet")
 
+    vote_log = input("Would you like to se vote log? (y/n)")
+    if vote_log == "y":
+        _print_vote_for_options(options)
+
+def _print_vote_for_options(options: list[Option]):
+    for option in options:
+        print(f"Option_value: {option.text}")
+        for vote in option.votes:
+            utc_date = datetime.datetime.fromtimestamp(vote[2], tz=datetime.timezone.utc)
+            local_date = utc_date.astimezone(pytz.timezone('Europe/Berlin')).strftime('%d-%m-%Y %H:%M')
+            print(f"\t- {vote[0]} on {local_date}")
 
 def randomize_poll_winner():
     poll_id = int(input("Enter poll you'd like to pick a winner for: "))
@@ -84,8 +97,8 @@ MENU_OPTIONS = {
 
 
 def menu():
-    connection = create_connection()
-    database.create_tables(connection)
+    with get_connection() as connection:
+        database.create_tables(connection)
 
     while (selection := input(MENU_PROMPT)) != "6":
         try:
